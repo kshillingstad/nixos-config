@@ -4,7 +4,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./nvidia.nix
+    ../../modules/nvidia.nix
     ../../modules/desktop.nix
     ../../modules/devtools.nix
     ../../modules/kernel.nix
