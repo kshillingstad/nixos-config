@@ -29,9 +29,7 @@
   # X11 windowing system
   services.xserver.enable = true;
 
-  # GNOME Desktop Environment
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+
 
   # Keymap configuration
   services.xserver.xkb = {
@@ -61,6 +59,16 @@
   # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.extraOptions = ''trusted-users = root kyle'';
+  
+  # Garbage collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+  
+  # Keep only the last 3 system generations
+  boot.loader.systemd-boot.configurationLimit = 3;
 
   # System version
   system.stateVersion = "25.05";

@@ -12,11 +12,6 @@
     brave
     discord
     spotify
-    gnome-tweaks
-    gnomeExtensions.caffeine
-    gnomeExtensions.custom-osd
-    gnomeExtensions.window-gestures
-    gnomeExtensions.x11-gestures
     openrgb-with-all-plugins
     system76-keyboard-configurator
   ];
