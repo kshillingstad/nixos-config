@@ -26,10 +26,11 @@
     git
     gh
     starship
-    #opencode
+    opencode
     python314
     go
     ripgrep
     fzf
+    vscode
   ];
 }

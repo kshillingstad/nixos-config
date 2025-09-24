@@ -13,4 +13,9 @@
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.latest;
   };
+
+  # Fix valgrind build issues affecting nvidia drivers
+  nixpkgs.config.packageOverrides = pkgs: {
+    libdrm = pkgs.libdrm.override { withValgrind = false; };
+  };
 }

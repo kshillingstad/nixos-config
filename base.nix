@@ -55,6 +55,11 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  
+  # Fix valgrind build issues affecting nvidia drivers
+  nixpkgs.config.packageOverrides = pkgs: {
+    libdrm = pkgs.libdrm.override { withValgrind = false; };
+  };
 
   # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

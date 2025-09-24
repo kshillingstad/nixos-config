@@ -1,7 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    chaotic = {
+      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";  # Force chaotic to use your nixpkgs
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -12,9 +15,11 @@
     nixosConfigurations = {
       # Gaming desktop with NVIDIA GPU
       bfgpu = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
         modules = [
           ./base.nix
           ./hosts/bfgpu
+          # Only import chaotic modules, not the full nixpkgs overlay
           chaotic.nixosModules.default
           home-manager.nixosModules.home-manager
           {
