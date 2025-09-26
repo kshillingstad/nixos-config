@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 
 {
   # X server not strictly required for headless/container usage; only set driver list when X is enabled elsewhere.
@@ -10,7 +10,7 @@
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
-    open = true; # Default to open kernel module; hosts can override per host
+    open = lib.mkDefault true; # Allow hosts to override with mkForce or explicit value
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.latest; # default to latest globally
   };
