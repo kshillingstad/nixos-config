@@ -46,6 +46,7 @@
   # NVIDIA for container workloads (module supplies driver + toolkit)
   # Use open kernel module variant like original config
   hardware.nvidia.open = false; # use proprietary (stable) driver
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.production; # per-host override to stable
   virtualisation.docker.enableNvidia = true; # merge with devtools rootless settings
 
 

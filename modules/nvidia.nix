@@ -12,7 +12,7 @@
     powerManagement.finegrained = false;
     open = true; # Default to open kernel module; hosts can override per host
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.production; # use stable driver series
+    package = config.boot.kernelPackages.nvidiaPackages.latest; # default to latest globally
   };
 
   # Fix valgrind build issues affecting nvidia drivers
