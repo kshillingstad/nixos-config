@@ -5,7 +5,7 @@
     ./hardware-configuration.nix
     ../../modules/nvidia.nix
     ../../modules/devtools.nix
-    ../../modules/kernel.nix
+    # ../../modules/kernel.nix  # disable custom cachyos kernel; use default
     ../../modules/zfs.nix
     ../../modules/user-kyle.nix
     ../../modules/tpm-luks.nix
@@ -45,7 +45,7 @@
 
   # NVIDIA for container workloads (module supplies driver + toolkit)
   # Use open kernel module variant like original config
-  hardware.nvidia.open = true;
+  hardware.nvidia.open = false; # use proprietary (stable) driver
   virtualisation.docker.enableNvidia = true; # merge with devtools rootless settings
 
 

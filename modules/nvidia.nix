@@ -10,9 +10,9 @@
     modesetting.enable = true;
     powerManagement.enable = false;
     powerManagement.finegrained = false;
-    open = true; # Default to open kernel module; hosts can override
+    open = true; # Default to open kernel module; hosts can override per host
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    package = config.boot.kernelPackages.nvidiaPackages.production; # use stable driver series
   };
 
   # Fix valgrind build issues affecting nvidia drivers
