@@ -30,14 +30,24 @@
         ];
       };
 
-      # Template for additional machines:
-      # laptop = nixpkgs.lib.nixosSystem {
-      #   modules = [
-      #     ./base.nix
-      #     ./hosts/laptop
-      #     chaotic.nixosModules.default
-      #   ];
-      # };
+      threadripper = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./base.nix
+          ./hosts/threadripper
+          chaotic.nixosModules.default
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.kyle = import ./home.nix;
+          }
+        ];
+      };
     };
+
+    # To add another machine, copy one of the existing host directories
+    # into hosts/<newname> and add a new entry here similar to bfgpu/threadripper.
+    # Keep host-specific logic inside hosts/<name>/default.nix and reuse modules/.
   };
 }

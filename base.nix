@@ -1,12 +1,11 @@
-# Base system configuration shared across all machines
+# Base system configuration shared across all machines (minimal, no GUI/audio)
 { config, pkgs, ... }:
-
 {
-  # Bootloader
+  # Bootloader defaults (hosts can override e.g. GRUB)
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Enable networking
+  # Networking
   networking.networkmanager.enable = true;
 
   # Time zone
@@ -26,55 +25,23 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # X11 windowing system
-  services.xserver.enable = true;
-
-
-
-  # Keymap configuration
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  # Printing
-  services.printing.enable = true;
-
-  # Audio with pipewire
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  # SSH
-  services.openssh.enable = true;
-
-  # Allow unfree packages
+  # Allow unfree packages globally
   nixpkgs.config.allowUnfree = true;
-  
-  # Fix valgrind build issues affecting nvidia drivers
-  nixpkgs.config.packageOverrides = pkgs: {
-    libdrm = pkgs.libdrm.override { withValgrind = false; };
-  };
 
   # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.extraOptions = ''trusted-users = root kyle'';
-  
+
   # Garbage collection
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
-  
-  # Keep only the last 3 system generations
+
+  # Keep only the last 3 system generations in boot menu
   boot.loader.systemd-boot.configurationLimit = 3;
 
-  # System version
+  # System version for NEW systems only (hosts may override)
   system.stateVersion = "25.05";
 }
