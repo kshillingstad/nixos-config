@@ -51,6 +51,15 @@
 
 
 
+  # Firewall: open ports for Ollama (11434) and Plex (32400, 1900/udp, 5353/udp, 8324, 32410-32414, 32469)
+  networking.firewall = {
+    enable = true; # default true, keep explicit
+    allowedTCPPorts = [ 11434 32400 8324 32469 ];
+    allowedUDPPorts = [ 1900 5353 ];
+    allowedTCPPortRanges = [ { from = 32410; to = 32414; } ];
+    allowedUDPPortRanges = [ { from = 32410; to = 32414; } ];
+  };
+
   # Keep original system state version (override base 25.05)
   system.stateVersion = lib.mkForce "24.11"; # Do not bump for existing install
 }
