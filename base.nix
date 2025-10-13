@@ -8,6 +8,11 @@
   # Networking
   networking.networkmanager.enable = true;
 
+  # Enable SSH on all machines
+  services.openssh = {
+    enable = true;
+  };
+
   # Time zone
   time.timeZone = "America/Chicago";
 
