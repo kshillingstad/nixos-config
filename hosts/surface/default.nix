@@ -3,7 +3,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    nixos-hardware.nixosModules.microsoft-surface-common
     ../../modules/desktop.nix
     ../../modules/devtools.nix
     ../../modules/gnome.nix

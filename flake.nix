@@ -35,7 +35,8 @@
         system = "x86_64-linux";
         modules = [
           ./base.nix
-          ./hosts/surface
+           ./hosts/surface
+          nixos-hardware.nixosModules.microsoft-surface-common
           chaotic.nixosModules.default
           home-manager.nixosModules.home-manager
           {
