@@ -9,9 +9,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
   };
 
-  outputs = { self, nixpkgs, chaotic, home-manager, ... }: {
+  outputs = { self, nixpkgs, chaotic, home-manager, nixos-hardware, ... }: {
     nixosConfigurations = {
       # Gaming desktop with NVIDIA GPU
       bfgpu = nixpkgs.lib.nixosSystem {
