@@ -30,6 +30,21 @@
         ];
       };
 
+       surface = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./base.nix
+          ./hosts/surface
+          chaotic.nixosModules.default
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.kyle = import ./home.nix;
+          }
+        ];
+      };
+
       threadripper = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
