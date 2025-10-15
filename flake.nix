@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
     chaotic = {
       url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
       inputs.nixpkgs.follows = "nixpkgs";  # Force chaotic to use your nixpkgs
@@ -9,10 +10,14 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-24.05";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
   };
 
-  outputs = { self, nixpkgs, chaotic, home-manager, nixos-hardware, ... }: {
+  outputs = { self, nixpkgs, nixpkgs-stable, chaotic, home-manager, home-manager-stable, nixos-hardware, ... }: {
     nixosConfigurations = {
       # Gaming desktop with NVIDIA GPU
       bfgpu = nixpkgs.lib.nixosSystem {
@@ -31,14 +36,14 @@
         ];
       };
 
-       surface = nixpkgs.lib.nixosSystem {
+       surface = nixpkgs-stable.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./base.nix
            ./hosts/surface
           nixos-hardware.nixosModules.microsoft-surface-common
           chaotic.nixosModules.default
-          home-manager.nixosModules.home-manager
+          home-manager-stable.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
