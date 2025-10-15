@@ -10,9 +10,13 @@ This repository contains a structured NixOS configuration that can be deployed a
 ├── modules/                    # Reusable modules
 │   ├── desktop.nix            # Desktop environment setup
 │   ├── devtools.nix           # Development tools
+│   ├── sunshine.nix           # Sunshine streaming server
 │   └── kernel.nix             # Kernel configuration
 └── hosts/                     # Machine-specific configurations
-    ├── bfgpu/                 # High-performance workstation with NVIDIA + desktop
+    ├── bfgpu/                 # High-performance workstation with NVIDIA + desktop + sunshine
+    │   ├── default.nix
+    │   └── hardware-configuration.nix
+    ├── surface/               # Microsoft Surface laptop with Surface-specific tweaks
     │   ├── default.nix
     │   └── hardware-configuration.nix
     └── threadripper/          # Headless compute + ZFS + NVIDIA container
@@ -72,7 +76,8 @@ sudo nixos-rebuild build --flake .#hostname
 
 ## Current Machines
 
-- **bfgpu**: High-performance workstation with NVIDIA GPU, full desktop environment (Wayland/GNOME via modules/desktop.nix)
+- **bfgpu**: High-performance workstation with NVIDIA GPU, full desktop environment (Wayland/GNOME), sunshine streaming server
+- **surface**: Microsoft Surface laptop with Surface-specific kernel (stable), NVIDIA GPU support, Firefox, full desktop environment (Wayland/GNOME)  
 - **threadripper**: Headless compute box with ZFS pool (Storage), NVIDIA open kernel driver + container toolkit for GPU workloads, Docker with GPU passthrough
 
 ## Maintenance Commands

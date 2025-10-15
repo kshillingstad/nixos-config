@@ -17,6 +17,14 @@
   # Preserve original Surface kernel choice from prior configuration.nix
   hardware.microsoft-surface.kernelVersion = "stable";
 
+  # Swap configuration for laptop (8GB swapfile)
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 8192; # 8GB in MB
+    }
+  ];
+
   # GUI already provided by shared modules; NVIDIA provided by shared module; per-host extras here
   programs.firefox.enable = true;
 
