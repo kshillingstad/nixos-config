@@ -19,7 +19,7 @@
 
   outputs = { self, nixpkgs, nixpkgs-stable, chaotic, home-manager, home-manager-stable, nixos-hardware, ... }: {
     nixosConfigurations = {
-      # Gaming desktop with NVIDIA GPU
+      # High-performance workstation with NVIDIA GPU
       bfgpu = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -36,11 +36,11 @@
         ];
       };
 
-       surface = nixpkgs-stable.lib.nixosSystem {
+      surface = nixpkgs-stable.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./base.nix
-           ./hosts/surface
+          ./hosts/surface
           nixos-hardware.nixosModules.microsoft-surface-common
           chaotic.nixosModules.default
           home-manager-stable.nixosModules.home-manager

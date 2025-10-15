@@ -12,7 +12,7 @@ This repository contains a structured NixOS configuration that can be deployed a
 │   ├── devtools.nix           # Development tools
 │   └── kernel.nix             # Kernel configuration
 └── hosts/                     # Machine-specific configurations
-    ├── bfgpu/                 # Gaming desktop with NVIDIA + desktop
+    ├── bfgpu/                 # High-performance workstation with NVIDIA + desktop
     │   ├── default.nix
     │   └── hardware-configuration.nix
     └── threadripper/          # Headless compute + ZFS + NVIDIA container
@@ -72,7 +72,7 @@ sudo nixos-rebuild build --flake .#hostname
 
 ## Current Machines
 
-- **bfgpu**: Gaming desktop with NVIDIA GPU, full desktop environment (Wayland/GNOME via modules/desktop.nix)
+- **bfgpu**: High-performance workstation with NVIDIA GPU, full desktop environment (Wayland/GNOME via modules/desktop.nix)
 - **threadripper**: Headless compute box with ZFS pool (Storage), NVIDIA open kernel driver + container toolkit for GPU workloads, Docker with GPU passthrough
 
 ## Maintenance Commands
