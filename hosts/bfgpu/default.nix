@@ -11,6 +11,7 @@
     ../../modules/gnome.nix
     ../../modules/user-kyle.nix
     ../../modules/tpm-luks.nix
+    ../../modules/sunshine.nix
   ];
 
   # Host-specific settings

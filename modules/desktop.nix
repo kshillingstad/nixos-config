@@ -2,12 +2,6 @@
 
 {
   services.hardware.openrgb.enable = true;
-  services.sunshine = {
-    enable = true;
-    autoStart = true;
-    capSysAdmin = true;
-    openFirewall = true;
-  };
   environment.systemPackages = with pkgs; [
     brave
     discord
