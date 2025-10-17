@@ -17,11 +17,21 @@
   # Preserve original Surface kernel choice from prior configuration.nix
   hardware.microsoft-surface.kernelVersion = "stable";
 
-  # Swap configuration for laptop (8GB swapfile)
+  # Optimal swap configuration for laptop
+  # Zram (compressed RAM) as primary swap - fast and reduces disk wear
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;  # Use 50% of RAM for zram (recommended for 8GB+ systems)
+    algorithm = "zstd";  # Best compression ratio and speed balance
+    priority = 100;      # Higher priority than disk swap
+  };
+
+  # Disk swap as fallback when zram is full + hibernation support
   swapDevices = [
     {
       device = "/var/lib/swapfile";
-      size = 8192; # 8GB in MB
+      size = 8192;      # 8GB for hibernation (needs to fit full RAM contents)
+      priority = 10;    # Lower priority than zram
     }
   ];
 
