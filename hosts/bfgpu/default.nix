@@ -9,9 +9,10 @@
     ../../modules/devtools.nix
     ../../modules/kernel.nix
     ../../modules/gnome.nix
+    ../../modules/hyprland.nix
     ../../modules/user-kyle.nix
     ../../modules/tpm-luks.nix
-    ../../modules/sunshine.nix
+    #../../modules/sunshine.nix
   ];
 
   # Host-specific settings

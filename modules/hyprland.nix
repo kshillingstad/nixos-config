@@ -10,10 +10,10 @@
   # Essential packages for Hyprland
   environment.systemPackages = with pkgs; [
     # Terminal emulator
-    kitty
+    
     
     # Application launcher
-    rofi-wayland
+    rofi
     
     # Status bar
     waybar
@@ -25,7 +25,7 @@
     swww
     
     # File manager
-    thunar
+    xfce.thunar
     
     # Screenshot utility
     grim
