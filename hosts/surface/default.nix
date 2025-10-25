@@ -8,6 +8,7 @@
     ../../modules/gnome.nix
     ../../modules/user-kyle.nix
     ../../modules/nvidia.nix
+    ../../modules/hyprland.nix
     # Intentionally NOT importing ../../modules/kernel.nix to keep
     # the Surface-specific kernel setting below.
   ];

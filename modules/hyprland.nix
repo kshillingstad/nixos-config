@@ -7,22 +7,21 @@
     xwayland.enable = true;
   };
 
-  # Essential packages for Hyprland
-  environment.systemPackages = with pkgs; [
-    # Terminal emulator
-    
-    
-    # Application launcher
-    rofi
-    
-    # Status bar
-    waybar
+   # Essential packages for Hyprland
+   environment.systemPackages = with pkgs; [
+     # Terminal emulator
+     
+     
+     # Application launcher
+     
+     # Status bar
+     waybar
     
     # Notification daemon
     mako
     
-    # Wallpaper
-    swww
+     # Wallpaper
+     hyprpaper
     
     # File manager
     xfce.thunar
