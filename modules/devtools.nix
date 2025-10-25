@@ -32,5 +32,6 @@
     ripgrep
     fzf
     vscode
+    pciutils
   ];
 }
