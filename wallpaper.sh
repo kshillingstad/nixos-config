@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set random wallpaper from wallpapers folder on new workspace using hyprpaper
-WALLPAPER_DIR="$(dirname "$0")/wallpapers"
+WALLPAPER_DIR="/home/kyle/nixos-config/wallpapers"
 if [ -d "$WALLPAPER_DIR" ] && [ "$(ls -A "$WALLPAPER_DIR")" ]; then
   # Preload all wallpapers
   find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | while read -r img; do

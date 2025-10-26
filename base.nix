@@ -13,6 +13,19 @@
     enable = true;
   };
 
+  # Audio system (pipewire)
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+  };
+
+  # Enable sound with pipewire
+  security.rtkit.enable = true;
+  services.pulseaudio.enable = false;
+
   # Time zone
   time.timeZone = "America/Chicago";
 
@@ -35,7 +48,7 @@
 
   # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.extraOptions = ''trusted-users = root kyle'';
+  nix.settings.trusted-users = [ "root" "kyle" ];
 
   # Garbage collection
   nix.gc = {

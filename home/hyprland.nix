@@ -8,11 +8,11 @@
     extraConfig = ''
       # --- Monitors ---
       monitor=,preferred,auto,1.6
+      monitor=,addreserved,10,10,10,10
 
       # --- Environment ---
       env = XCURSOR_SIZE,32
-
-      env = XCURSOR_SIZE,32
+      env = XCURSOR_THEME,Adwaita
 
       # --- General Appearance ---
       general {
@@ -75,12 +75,16 @@
 
       # --- Keybindings ---
       $mod = SUPER
+      bind = $mod, Return, exec, alacritty
       bind = $mod, T, exec, alacritty
       bind = $mod, B, exec, brave
       bind = $mod, E, exec, thunar
       bind = $mod SHIFT, L, exec, hyprlock
       bind = $mod, Q, killactive
       bind = $mod, Space, exec, wofi --show run
+      bind = $mod, W, exec, /home/kyle/.config/wallpaper-picker.sh
+      bind = $mod, Escape, exec, /home/kyle/.config/logout.sh
+      bind = $mod SHIFT, Q, exec, pkill Hyprland
 
       # Move focus
       bind = $mod, h, movefocus, l
@@ -123,15 +127,13 @@
       bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
       bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
 
-      # Window rules
-      windowrulev2 = noblur, class:(waybar)
-      windowrulev2 = noshadow, class:(waybar)
-      windowrule = float, class:(waybar)
-      windowrule = pin, class:(waybar)
+# Window rules
+           windowrulev2 = noblur, class:(waybar)
+           windowrulev2 = noshadow, class:(waybar)
 
       # --- Exec once on session start ---
-      exec-once = hyprpaper &
-      exec-once = ~/nixos-config/wallpaper.sh &
+      exec-once = hyprpaper
+      exec-once = sleep 1 && ~/nixos-config/wallpaper.sh
       exec-once = waybar
       exec-once = mako
     '';

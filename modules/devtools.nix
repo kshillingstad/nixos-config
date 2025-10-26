@@ -16,12 +16,10 @@
     gcc
     neofetch
     fastfetch
-    btop
     neovim
     devenv
     direnv
     tmux
-    alacritty
     lazygit
     git
     gh
@@ -31,7 +29,6 @@
     go
     ripgrep
     fzf
-    vscode
     pciutils
   ];
 }

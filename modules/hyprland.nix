@@ -10,9 +10,10 @@
    # Essential packages for Hyprland
    environment.systemPackages = with pkgs; [
      # Terminal emulator
-     
+     alacritty
      
      # Application launcher
+     wofi
      
      # Status bar
      waybar

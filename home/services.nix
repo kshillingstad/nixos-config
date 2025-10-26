@@ -1,6 +1,10 @@
 # Services configuration
-{ config, c, ... }:
+{ config, ... }:
 
+let
+  theme = config.theme or "nord";
+  c = import ../themes/${theme}.nix;
+in
 {
   # Mako notifications
   services.mako = {

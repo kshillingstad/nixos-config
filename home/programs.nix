@@ -1,7 +1,46 @@
 # Programs configuration
-{ config, pkgs, inputs, c, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+  theme = config.theme or "nord";
+  c = import ../themes/${theme}.nix;
+in
 {
+  # Cursor theme
+  home.pointerCursor = {
+    name = "Adwaita";
+    package = pkgs.adwaita-icon-theme;
+    size = 24;
+    gtk.enable = true;
+  };
+
+  # GTK theme and cursor
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Adwaita-dark";
+      package = pkgs.gnome-themes-extra;
+    };
+    iconTheme = {
+      name = "Adwaita";
+      package = pkgs.adwaita-icon-theme;
+    };
+    cursorTheme = {
+      name = "Adwaita";
+      package = pkgs.adwaita-icon-theme;
+      size = 24;
+    };
+  };
+
+  # Qt theme and cursor
+  qt = {
+    enable = true;
+    platformTheme.name = "gtk";
+    style = {
+      name = "adwaita-dark";
+      package = pkgs.adwaita-qt;
+    };
+  };
   # Alacritty terminal emulator
   programs.alacritty = {
     enable = true;
@@ -118,13 +157,7 @@
     userEmail = "kyleshillingstad@gmail.com";
   };
 
-  # Starship prompt
-  programs.starship = {
-    enable = true;
-    settings = {
-      # Add custom settings if desired
-    };
-  };
+  
 
   # Neovim with LazyVim
   programs.neovim = {
@@ -138,47 +171,37 @@
     recursive = true;
   };
 
-  # Waybar configuration
-  programs.waybar = {
-    enable = true;
-    settings = {
-      mainBar = {
-        layer = "top";
-        position = "top";
-        height = 40;
-        modules-left = [ "hyprland/workspaces" "custom/system" ];
-        modules-center = [ "clock" ];
-          modules-right = [ "pulseaudio" "network" "mpris" "battery" "tray" ];
-        clock = { format = "{:%a %m/%d %H:%M}"; tooltip-format = "{:%A %B %d %Y}"; };
-        pulseaudio = { format = " {volume}%"; tooltip = true; };
-        network = { format-wifi = ""; format-ethernet = ""; format-disconnected = ""; tooltip = true; };
-        "custom/system" = {
-          exec = "cpu=$(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print int(100 - $1)}') mem=$(free -h | awk 'NR==2{printf \"%s/%s\", $3,$2}') temp=$(sensors | grep 'Package id 0' | awk '{print int($4) \"°C\"}') echo \" $cpu% $temp  $mem\"";
-          format = "{}";
-          interval = 5;
-          tooltip = true;
-        };
-          mpris = { format = "{player_icon} {title:.10} - {artist:.10}"; format-paused = "{status_icon} <i>{title:.10} - {artist:.10}</i>"; player-icons = { default = "▶"; mpv = "🎵"; spotify = "🎵"; }; on-click = "playerctl play-pause"; tooltip = true; };
-          battery = { format = "{capacity}% {icon}"; format-icons = ["" "" "" "" ""]; tooltip = true; };
-          tray = { spacing = 8; };
-      };
-    };
-    style = ''
-      * { font-family: "Hack Nerd Font"; font-size: 16px; color: ${c.base06}; }
-        window#waybar { background: ${c.base00}; }
-       #workspaces button { padding: 0 10px; }
-       #workspaces button.focused { background: ${c.base0D}; }
-       #clock, #cpu, #memory, #network, #temperature, #pulseaudio, #mpris { padding: 0 10px; }
-     '';
-  };
-
   # Wofi launcher
   programs.wofi = {
     enable = true;
+    settings = {
+      allow_markup = true;
+      width = 600;
+      height = 400;
+      location = "center";
+      show = "drun";
+      prompt = "Search...";
+      filter_rate = 100;
+      allow_images = true;
+      gtk_dark_theme = true;
+      term = "alacritty";
+      exec_search = false;
+      hide_search = false;
+      normal_window = false;
+      layers = "top";
+      matching = "fuzzy";
+      key_expand = "Tab";
+      key_exit = "Escape";
+      key_nav_up = "Up";
+      key_nav_down = "Down";
+      key_nav_forward = "Right";
+      key_nav_back = "Left";
+      key_submit = "Return";
+    };
     style = ''
       * {
-        font-family: 'CaskaydiaMono Nerd Font', monospace;
-        font-size: 18px;
+        font-family: 'Hack Nerd Font', monospace;
+        font-size: 16px;
       }
 
       window {
@@ -186,6 +209,22 @@
         padding: 20px;
         background-color: ${c.base00};
         opacity: 0.95;
+        border-radius: 12px;
+        border: 2px solid ${c.base0D};
+      }
+
+      #input {
+        margin: 0 0 10px 0;
+        padding: 12px;
+        border: none;
+        background-color: ${c.base01};
+        color: ${c.base06};
+        border-radius: 8px;
+        outline: none;
+      }
+
+      #input:focus {
+        border: 2px solid ${c.base0D};
       }
 
       #inner-box {
@@ -197,7 +236,7 @@
 
       #outer-box {
         margin: 0;
-        padding: 20px;
+        padding: 0;
         border: none;
         background-color: ${c.base00};
       }
@@ -209,42 +248,128 @@
         background-color: ${c.base00};
       }
 
-      #input {
-        margin: 0;
-        padding: 10px;
-        border: none;
-        background-color: ${c.base00};
-        color: ${c.base06};
-      }
-
-      #input:focus {
-        outline: none;
-        box-shadow: none;
-        border: none;
-      }
-
       #text {
         margin: 5px;
+        padding: 8px;
         border: none;
         color: ${c.base06};
+        border-radius: 6px;
       }
 
       #entry {
         background-color: ${c.base00};
+        border-radius: 6px;
+        margin: 2px 0;
       }
 
       #entry:selected {
-        outline: none;
-        border: none;
+        background-color: ${c.base0D};
+        color: ${c.base00};
+        font-weight: bold;
       }
 
       #entry:selected #text {
-        color: ${c.base02};
+        color: ${c.base00};
       }
 
       #entry image {
-        -gtk-icon-transform: scale(0.7);
+        -gtk-icon-transform: scale(0.8);
+        margin-right: 8px;
+      }
+
+      #unselected {
+        background-color: transparent;
+      }
+
+      #selected {
+        background-color: ${c.base0D};
+      }
+
+      #urgent {
+        background-color: ${c.base08};
+        color: ${c.base00};
       }
     '';
+  };
+
+  # Create custom desktop entries for better Wofi results
+  xdg.desktopEntries = {
+    brave = {
+      name = "Brave Browser";
+      exec = "brave %U";
+      icon = "brave-browser";
+      categories = [ "Network" "WebBrowser" ];
+      terminal = false;
+    };
+    alacritty = {
+      name = "Alacritty";
+      exec = "alacritty";
+      icon = "Alacritty";
+      categories = [ "System" "TerminalEmulator" ];
+      terminal = false;
+    };
+    thunar = {
+      name = "Thunar File Manager";
+      exec = "thunar %U";
+      icon = "Thunar";
+      categories = [ "System" "FileManager" ];
+      terminal = false;
+    };
+    spotify = {
+      name = "Spotify";
+      exec = "spotify %U";
+      icon = "spotify-client";
+      categories = [ "AudioVideo" "Audio" ];
+      terminal = false;
+    };
+    vscode = {
+      name = "Visual Studio Code";
+      exec = "code %U";
+      icon = "code";
+      categories = [ "Development" "IDE" ];
+      terminal = false;
+    };
+    btop = {
+      name = "btop Monitor";
+      exec = "alacritty -e btop";
+      icon = "utilities-system-monitor";
+      categories = [ "System" "Monitor" ];
+      terminal = false;
+    };
+    nvim = {
+      name = "Neovim";
+      exec = "alacritty -e nvim";
+      icon = "nvim";
+      categories = [ "Development" "TextEditor" ];
+      terminal = false;
+    };
+    pavucontrol = {
+      name = "PulseAudio Volume Control";
+      exec = "pavucontrol";
+      icon = "multimedia-volume-control";
+      categories = [ "AudioVideo" "Audio" ];
+      terminal = false;
+    };
+    blueman = {
+      name = "Blueman Manager";
+      exec = "blueman-manager";
+      icon = "blueman";
+      categories = [ "System" "Settings" ];
+      terminal = false;
+    };
+    wallpaper-picker = {
+      name = "Wallpaper Picker";
+      exec = "/home/kyle/.config/wallpaper-picker.sh";
+      icon = "preferences-desktop-wallpaper";
+      categories = [ "Graphics" ];
+      terminal = false;
+    };
+    logout = {
+      name = "Logout Menu";
+      exec = "wlogout -p layer-top";
+      icon = "system-log-out";
+      categories = [ "System" ];
+      terminal = false;
+    };
   };
 }

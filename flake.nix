@@ -31,8 +31,8 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
-              home-manager.users.kyle = import ./home.nix { theme = "nord"; };
+              home-manager.extraSpecialArgs = { inherit inputs; theme = "nord"; };
+              home-manager.users.kyle = import ./home.nix;
             }
          ];
        };
@@ -49,7 +49,8 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; theme = "nord"; };
+              home-manager.backupFileExtension = "backup";
+              home-manager.extraSpecialArgs = { inherit inputs; theme = "tokyo-night"; };
               home-manager.users.kyle = import ./home.nix;
             }
          ];
@@ -66,8 +67,9 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
-              home-manager.users.kyle = import ./home.nix { theme = "nord"; };
+              home-manager.backupFileExtension = "backup";
+              home-manager.extraSpecialArgs = { inherit inputs; theme = "nord"; };
+              home-manager.users.kyle = import ./home.nix;
             }
          ];
        };

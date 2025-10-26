@@ -26,6 +26,11 @@
     };
   };
 
+  # Firewall configuration
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 80 443 8080 3000 5173 ];
+  networking.firewall.allowedUDPPorts = [ 22 ];
+
   environment.systemPackages = (with pkgs; [
     tpm2-tools
     tpm2-tss
