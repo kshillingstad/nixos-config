@@ -133,7 +133,7 @@
 
       # --- Exec once on session start ---
       exec-once = hyprpaper
-      exec-once = sleep 1 && ~/nixos-config/wallpaper.sh
+      exec-once = sleep 1 && /home/kyle/nixos-config/wallpaper.sh
       exec-once = waybar
       exec-once = mako
     '';

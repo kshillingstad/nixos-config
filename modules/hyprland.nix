@@ -43,9 +43,12 @@
     # Clipboard manager
     wl-clipboard
     
-    # Brightness control
-    brightnessctl
-  ];
+# Brightness control
+     brightnessctl
+     
+     # Network utilities for wallpaper script
+     socat
+   ];
 
   # XDG Desktop Portal for screen sharing and file dialogs
   xdg.portal = {

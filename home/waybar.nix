@@ -31,9 +31,9 @@ in
         };
         
         network = { 
-          format-wifi = ""; 
-          format-ethernet = ""; 
-          format-disconnected = "睊"; 
+          format-wifi = " "; 
+          format-ethernet = " "; 
+          format-disconnected = "睊 "; 
           tooltip-format-wifi = "WiFi: {essid}";
           tooltip-format-ethernet = "Ethernet";
           tooltip-format-disconnected = "Disconnected";
@@ -43,7 +43,7 @@ in
         
         
         "custom/dynamic" = {
-          exec = "/home/kyle/.config/waybar/dynamic.sh";
+          exec = "/home/kyle/nixos-config/home/scripts/waybar-dynamic.sh";
           format = "{}";
           interval = 3;
           tooltip = true;
@@ -82,9 +82,9 @@ in
         
         
         battery = { 
-          format = "{capacity}% {icon}"; 
-          format-charging = "{capacity}% ";
-          format-full = "{capacity}% {icon}";
+          format = "{capacity}% {icon} "; 
+          format-charging = "{capacity}%  ";
+          format-full = "{capacity}% {icon} ";
           format-icons = ["" "" "" "" ""]; 
           format-time = "{H}h{M}m";
           tooltip-format = "{timeTo} ({power}W)";

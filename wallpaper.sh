@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/run/current-system/sw/bin/bash
 # Set random wallpaper from wallpapers folder on new workspace using hyprpaper
 WALLPAPER_DIR="/home/kyle/nixos-config/wallpapers"
 if [ -d "$WALLPAPER_DIR" ] && [ "$(ls -A "$WALLPAPER_DIR")" ]; then
