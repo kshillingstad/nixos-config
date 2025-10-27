@@ -1,6 +1,10 @@
 # Btop system monitor
 { config, ... }:
 
+let
+  theme = config.theme or "nord";
+  c = import ../themes/${theme}.nix;
+in
 {
   programs.btop = {
     enable = true;
@@ -70,4 +74,40 @@
       log_level = "WARNING";
     };
   };
+  
+  # Create custom btop theme
+  home.file.".config/btop/themes/custom.theme".text = ''
+    # Main background, semi-transparent
+    main_bg=${c.base00}
+    # Text and foreground UI elements
+    main_fg=${c.base06}
+    # Background of text input widgets like search
+    text_bg=${c.base01}
+    # Foreground color of text input widgets
+    text_fg=${c.base06}
+    # Background of selected/focused items
+    selected_bg=${c.base0D}
+    # Foreground of selected/focused items
+    selected_fg=${c.base00}
+    # Background of inactive/disabled items
+    inactive_bg=${c.base01}
+    # Foreground of inactive/disabled items
+    inactive_fg=${c.base04}
+    # Various UI colors
+    title=${c.base0D}
+    hi_fg=${c.base08}
+    # Graph colors
+    graph_color_cpu=${c.base0D}
+    graph_color_mem=${c.base0B}
+    graph_color_net=${c.base0A}
+    graph_color_proc=${c.base0E}
+    # Misc colors
+    meter_bg=${c.base01}
+    meter_fg=${c.base0D}
+    proc_misc=${c.base0C}
+    # Battery colors
+    bat_good=${c.base0B}
+    bat_mid=${c.base0A}
+    bat_bad=${c.base08}
+  '';
 }

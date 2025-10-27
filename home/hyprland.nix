@@ -76,9 +76,10 @@
       # --- Keybindings ---
       $mod = SUPER
       bind = $mod, Return, exec, alacritty
-      bind = $mod, T, exec, alacritty
+      bind = $mod, T, exec, /home/kyle/.config/theme-picker.sh
       bind = $mod, B, exec, brave
       bind = $mod, E, exec, thunar
+      bind = $mod, N, exec, nm-connection-editor
       bind = $mod SHIFT, L, exec, hyprlock
       bind = $mod, Q, killactive
       bind = $mod, Space, exec, wofi --show run
@@ -126,6 +127,12 @@
       bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
       bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
       bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+
+      # Brightness keys
+      bind = , XF86MonBrightnessUp, exec, brightnessctl set +5%
+      bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
+      bind = $mod, Prior, exec, brightnessctl set +10%  # Mod + Page Up
+      bind = $mod, Next, exec, brightnessctl set 10%    # Mod + Page Down
 
 # Window rules
            windowrulev2 = noblur, class:(waybar)

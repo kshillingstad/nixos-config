@@ -1,8 +1,8 @@
 { config, pkgs, lib, inputs, ... }@args:
 
 let
-  # Theme configuration
-  theme = args.theme or "nord";
+  # Theme configuration - default to nord for build time
+  theme = "nord";
   c = import ./themes/${theme}.nix;
 in
 {
@@ -34,6 +34,14 @@ in
     lm_sensors
     # Bluetooth management
     blueman
+    # WiFi management
+    networkmanagerapplet
+    # System utilities
+    jq
+    procps # for killall
+    libnotify # for notify-send
+    brightnessctl # for brightness control
+    
     # Media control
     playerctl
     # Wallpaper management
@@ -153,6 +161,227 @@ in
               exit 0
               ;;
       esac
+    '';
+    executable = true;
+  };
+
+  home.file.".config/theme-picker.sh" = {
+    text = ''
+      #!/usr/bin/env bash
+      # Theme picker menu using wofi
+
+      THEME_DIR="/home/kyle/nixos-config/themes"
+      CONFIG_DIR="/home/kyle/.config"
+
+      # Theme list with display names
+      declare -A THEMES=(
+        ["nord"]="Nord"
+        ["tokyo-night"]="Tokyo Night"
+        ["solarized-light"]="Solarized Light"
+        ["solarized-dark"]="Solarized Dark"
+        ["catppuccin"]="Catppuccin"
+        ["dracula"]="Dracula"
+        ["gruvbox"]="Gruvbox"
+        ["onedark"]="One Dark"
+      )
+
+      # Create menu options
+      OPTIONS="Nord\nTokyo Night\nSolarized Light\nSolarized Dark\nCatppuccin\nDracula\nGruvbox\nOne Dark\nCancel"
+
+      # Show wofi menu
+      CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt="Select Theme" --width=350 --height=400)
+
+      # Map display names to theme keys
+      case "$CHOICE" in
+          "Nord")
+              SELECTED_THEME="nord"
+              ;;
+          "Tokyo Night")
+              SELECTED_THEME="tokyo-night"
+              ;;
+          "Solarized Light")
+              SELECTED_THEME="solarized-light"
+              ;;
+          "Solarized Dark")
+              SELECTED_THEME="solarized-dark"
+              ;;
+          "Catppuccin")
+              SELECTED_THEME="catppuccin"
+              ;;
+          "Dracula")
+              SELECTED_THEME="dracula"
+              ;;
+          "Gruvbox")
+              SELECTED_THEME="gruvbox"
+              ;;
+          "One Dark")
+              SELECTED_THEME="onedark"
+              ;;
+          *)
+              SELECTED_THEME=""
+              ;;
+      esac
+
+      # Apply theme or cancel
+      if [ "$CHOICE" = "Cancel" ] || [ -z "$SELECTED_THEME" ]; then
+          exit 0
+      else
+      # Load theme colors using nix eval
+      THEME_COLORS=$(nix eval --impure --json --expr "import $THEME_DIR/$SELECTED_THEME.nix" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+      eval "$THEME_COLORS"
+
+      # Override waybar CSS temporarily
+      mkdir -p "$CONFIG_DIR/theme-overrides"
+      cat > "$CONFIG_DIR/theme-overrides/waybar.css" << EOF
+      * { font-family: "Hack Nerd Font"; font-size: 16px; color: $base06; }
+      window#waybar { 
+        background: $base00; 
+        margin: 0;
+        border-radius: 0;
+       }
+      #workspaces button { padding: 0 8px; margin: 0 2px; }
+      #workspaces button.focused { background: $base0D; }
+      #clock, #cpu, #memory, #network, #temperature, #pulseaudio, #mpris, #battery, #tray { padding: 0 6px; margin: 0 1px; }
+      EOF
+
+      # Override wofi CSS temporarily
+      mkdir -p "$CONFIG_DIR/theme-overrides"
+      cat > "$CONFIG_DIR/theme-overrides/wofi.css" << EOF
+      * {
+        font-family: 'Hack Nerd Font', monospace;
+        font-size: 16px;
+      }
+
+      window {
+        margin: 0px;
+        padding: 20px;
+        background-color: $base00;
+        opacity: 0.95;
+        border-radius: 12px;
+        border: 2px solid $base0D;
+      }
+
+      #input {
+        margin: 0 0 10px 0;
+        padding: 12px;
+        border: none;
+        background-color: $base01;
+        color: $base06;
+        border-radius: 8px;
+        outline: none;
+      }
+
+      #input:focus {
+        border: 2px solid $base0D;
+      }
+
+      #inner-box {
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: $base00;
+      }
+
+      #outer-box {
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: $base00;
+      }
+
+      #scroll {
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: $base00;
+      }
+
+      #text {
+        margin: 5px;
+        padding: 8px;
+        border: none;
+        color: $base06;
+        border-radius: 6px;
+      }
+
+      #entry {
+        background-color: $base00;
+        border-radius: 6px;
+        margin: 2px 0;
+      }
+
+      #entry:selected {
+        background-color: $base0D;
+        color: $base00;
+        font-weight: bold;
+      }
+
+      #entry:selected #text {
+        color: $base00;
+      }
+
+      #entry image {
+        -gtk-icon-transform: scale(0.8);
+        margin-right: 8px;
+      }
+
+      #unselected {
+        background-color: transparent;
+      }
+
+      #selected {
+        background-color: $base0D;
+      }
+
+      #urgent {
+        background-color: $base08;
+        color: $base00;
+      }
+      EOF
+
+      # Override alacritty config temporarily
+      mkdir -p "$CONFIG_DIR/alacritty"
+      cat > "$CONFIG_DIR/alacritty/alacritty.yml" << EOF
+      font:
+        normal:
+          family: "Hack Nerd Font"
+      window:
+        decorations: "none"
+      colors:
+        primary:
+          background: "$base00"
+          foreground: "$base06"
+        normal:
+          black: "$base00"
+          red: "$base08"
+          green: "$base0B"
+          yellow: "$base0A"
+          blue: "$base0D"
+          magenta: "$base0E"
+          cyan: "$base0C"
+          white: "$base05"
+        bright:
+          black: "$base03"
+          red: "$base08"
+          green: "$base0B"
+          yellow: "$base0A"
+          blue: "$base0D"
+          magenta: "$base0E"
+          cyan: "$base0C"
+          white: "$base07"
+      EOF
+
+      # Save selected theme
+      echo "$SELECTED_THEME" > "$CONFIG_DIR/current-theme"
+
+      # Restart waybar with custom CSS
+      pkill waybar
+      sleep 0.5
+      waybar --style="$CONFIG_DIR/theme-overrides/waybar.css" &
+
+      # Send notification
+      notify-send "Theme switched to $CHOICE"
+      fi
     '';
     executable = true;
   };

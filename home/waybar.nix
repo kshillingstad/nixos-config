@@ -15,7 +15,7 @@ in
         height = 26;
         modules-left = [ "hyprland/workspaces" "custom/dynamic" ];
         modules-center = [ "clock" ];
-        modules-right = [ "network" "custom/sep1" "pulseaudio" "custom/sep2" "mpris" "custom/sep3" "battery" "tray" ];
+        modules-right = [ "mpris" "custom/sep1" "network" "custom/sep2" "pulseaudio" "custom/sep3" "battery" "tray" ];
         
         clock = { 
           format = "{:%a %m/%d %I:%M %p}"; 
@@ -37,7 +37,8 @@ in
           tooltip-format-wifi = "WiFi: {essid}";
           tooltip-format-ethernet = "Ethernet";
           tooltip-format-disconnected = "Disconnected";
-          tooltip = true; 
+          tooltip = true;
+          on-click = "nm-connection-editor"; 
         };
         
         
@@ -62,8 +63,9 @@ in
           tooltip = false;
         };
         mpris = { 
-          format = "{player_icon} {title:.15} - {artist:.10}"; 
-          format-paused = "{status_icon} <i>{title:.15} - {artist:.10}</i>"; 
+          format = "{player_icon} {title} - {artist}"; 
+          format-paused = "{status_icon} <i>{title} - {artist}</i>";
+          ignored-players = [ "firefox" "chromium" ]; 
           player-icons = { 
             default = ""; 
             mpv = ""; 
@@ -75,7 +77,9 @@ in
           on-click-right = "playerctl next"; 
           on-scroll-up = "playerctl next"; 
           on-scroll-down = "playerctl previous"; 
-          tooltip-format = "{player} - {title} - {artist} ({position}/{duration})"; 
+          tooltip-format = "{player} - {title} - {artist} ({position}/{duration})";
+          max-length = 30;
+          scroll = true; 
           tooltip = true; 
         };
         
@@ -88,7 +92,8 @@ in
           format-icons = ["" "" "" "" ""]; 
           format-time = "{H}h{M}m";
           tooltip-format = "{timeTo} ({power}W)";
-          tooltip = true; 
+          tooltip = true;
+          on-click = ""; 
         };
         
         

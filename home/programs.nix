@@ -41,12 +41,15 @@ in
       package = pkgs.adwaita-qt;
     };
   };
-  # Alacritty terminal emulator
+# Alacritty terminal emulator
   programs.alacritty = {
     enable = true;
     settings = {
       font.normal.family = "Hack Nerd Font";
       window.decorations = "none";
+      import = [
+        "~/.config/alacritty/alacritty.yml"
+      ];
       colors = {
         primary = {
           background = "${c.base00}";
@@ -179,13 +182,13 @@ in
       width = 600;
       height = 400;
       location = "center";
-      show = "drun";
+      show = "drun,run";
       prompt = "Search...";
       filter_rate = 100;
       allow_images = true;
       gtk_dark_theme = true;
       term = "alacritty";
-      exec_search = false;
+      exec_search = true;
       hide_search = false;
       normal_window = false;
       layers = "top";
@@ -199,6 +202,7 @@ in
       key_submit = "Return";
     };
     style = ''
+      @import "/home/kyle/.config/theme-overrides/wofi.css";
       * {
         font-family: 'Hack Nerd Font', monospace;
         font-size: 16px;
@@ -371,5 +375,13 @@ in
       categories = [ "System" ];
       terminal = false;
     };
+    network-manager = {
+      name = "Network Manager";
+      exec = "nm-connection-editor";
+      icon = "network-wireless";
+      categories = [ "System" "Settings" ];
+      terminal = false;
+    };
+    
   };
 }
