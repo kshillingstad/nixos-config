@@ -42,7 +42,7 @@ ENROLL_OUT=$(sudo systemd-cryptenroll "$LUKS_DEV" || true)
 echo "$ENROLL_OUT"
 echo "----------------------------------"; echo
 
-TPM_SLOT_LINE=$(printf "%s\n" "$ENROLL_OUT" | grep -i "^Slot tpm2:" || true)
+TPM_SLOT_LINE=$(printf "%s\n" "$ENROLL_OUT" | awk '/^[[:space:]]+[0-9]+[[:space:]]+tpm2( |$)/ {print}')
 if [[ -n "$TPM_SLOT_LINE" ]]; then
   green "TPM slot present: $TPM_SLOT_LINE"
   PCRS=$(printf "%s\n" "$TPM_SLOT_LINE" | sed -n 's/.*PCRs: *//p')
