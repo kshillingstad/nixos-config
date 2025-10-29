@@ -14,6 +14,7 @@ in
     ./home/btop.nix
     ./home/starship.nix
     ./home/fastfetch.nix
+    ./home/alacritty.nix
     ./home/waybar.nix
   ];
 
@@ -53,6 +54,8 @@ in
     pavucontrol
     blueman
   ];
+
+  # Alacritty baseline moved to home/alacritty.nix
 
   # Copy scripts to home directory
   home.file.".config/waybar/dynamic.sh" = {

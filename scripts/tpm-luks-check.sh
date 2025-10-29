@@ -25,7 +25,7 @@ if ! sudo cryptsetup isLuks "$LUKS_DEV"; then
 green "Device is a LUKS container."
 
 # 3. Show LUKS version
-VERSION=$(sudo cryptsetup luksDump "$LUKS_DEV" | awk -F': ' '/Version:/ {print $2}')
+VERSION=$(sudo cryptsetup luksDump "$LUKS_DEV" | awk -F': ' '/Version:/ {gsub(/^[ \t]+|[ \t]+$/,"",$2); print $2}')
 echo "LUKS version: $VERSION"
 [[ "$VERSION" != "2" ]] && yellow "Warning: TPM auto-unlock strongly prefers LUKS2."
 

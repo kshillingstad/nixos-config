@@ -43,43 +43,7 @@ in
     };
   };
 
-  # Alacritty terminal emulator (headless OK)
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      font.normal.family = "Hack Nerd Font";
-      window.decorations = "none";
-      import = [
-        "~/.config/alacritty/alacritty.yml"
-      ];
-      colors = {
-        primary = {
-          background = "${c.base00}";
-          foreground = "${c.base06}";
-        };
-        normal = {
-          black = "${c.base00}";
-          red = "${c.base08}";
-          green = "${c.base0B}";
-          yellow = "${c.base0A}";
-          blue = "${c.base0D}";
-          magenta = "${c.base0E}";
-          cyan = "${c.base0C}";
-          white = "${c.base05}";
-        };
-        bright = {
-          black = "${c.base03}";
-          red = "${c.base08}";
-          green = "${c.base0B}";
-          yellow = "${c.base0A}";
-          blue = "${c.base0D}";
-          magenta = "${c.base0E}";
-          cyan = "${c.base0C}";
-          white = "${c.base07}";
-        };
-      };
-    };
-  };
+  # Alacritty configuration moved to home/alacritty.nix
 
   # Tmux terminal multiplexer (headless OK)
   programs.tmux = {
