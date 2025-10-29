@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }@args:
+{ config, pkgs, lib, inputs, dconfEnabled ? true, ... }@args:
 
 let
   # Theme configuration - default to nord for build time

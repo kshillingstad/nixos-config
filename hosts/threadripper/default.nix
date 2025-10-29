@@ -25,13 +25,13 @@
 
   # Keyfile + LUKS now via TPM/LUKS module abstraction
   boot.initrd.secrets."/boot/crypto_keyfile.bin" = null;
-  my.tpmLuks.devices = {
+   my.tpmLuks.devices = {
     "luks-065901f2-5652-4d3d-b1ba-48569f358729" = {
       device = "/dev/disk/by-uuid/065901f2-5652-4d3d-b1ba-48569f358729";
       keyFile = "/boot/crypto_keyfile.bin";
-      tpm2 = false; # set to true if you later enroll TPM
+      tpm2 = true; # TPM enrolled for auto-unlock
     };
-  };
+   };
 
   # ZFS settings carried over (now mostly in modules/zfs.nix)
   boot.zfs.extraPools = [ "Storage" ];
@@ -51,15 +51,15 @@
 
 
 
-  # Firewall: open ports for Ollama (11434) and Plex (32400, 1900/udp, 5353/udp, 8324, 32410-32414, 32469)
-  networking.firewall = {
-    enable = true; # default true, keep explicit
-    allowedTCPPorts = [ 11434 32400 8324 32469 ];
-    allowedUDPPorts = [ 1900 5353 ];
-    allowedTCPPortRanges = [ { from = 32410; to = 32414; } ];
-    allowedUDPPortRanges = [ { from = 32410; to = 32414; } ];
-  };
+   # Firewall: open common dev ports plus Ollama (11434) and Plex (32400, 1900/udp, 5353/udp, 8324, 32410-32414, 32469)
+   networking.firewall = {
+     enable = true; # default true, keep explicit
+     allowedTCPPorts = [ 22 80 443 8080 3000 5173 11434 32400 8324 32469 ];
+     allowedUDPPorts = [ 22 1900 5353 ];
+     allowedTCPPortRanges = [ { from = 32410; to = 32414; } ];
+     allowedUDPPortRanges = [ { from = 32410; to = 32414; } ];
+   };
 
-  # Keep original system state version (override base 25.05)
-  system.stateVersion = lib.mkForce "24.11"; # Do not bump for existing install
-}
+   # Keep original system state version (override base 25.05)
+   system.stateVersion = lib.mkForce "24.11"; # Do not bump for existing install
+ }

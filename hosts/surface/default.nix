@@ -52,10 +52,5 @@
 
   # GUI already provided by shared modules; NVIDIA provided by shared module; per-host extras here
 
-  environment.systemPackages = (with pkgs; [
-    tpm2-tools
-    tpm2-tss
-  ]);
-
-  # Leave system.stateVersion to base.nix (25.05 for new systems)
+   # Leave system.stateVersion to base.nix (25.05 for new systems)
 }

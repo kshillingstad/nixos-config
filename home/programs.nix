@@ -14,9 +14,9 @@ in
     gtk.enable = true;
   };
 
-  # GTK theme and cursor
+  # GTK theme and cursor (only for GUI systems)
   gtk = {
-    enable = true;
+    enable = dconfEnabled;
     theme = {
       name = "Adwaita-dark";
       package = pkgs.gnome-themes-extra;
@@ -32,9 +32,9 @@ in
     };
   };
 
-  # Qt theme and cursor
+  # Qt theme and cursor (only for GUI systems)
   qt = {
-    enable = true;
+    enable = dconfEnabled;
     platformTheme.name = "gtk";
     style = {
       name = "adwaita-dark";

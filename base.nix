@@ -57,9 +57,15 @@
     options = "--delete-older-than 30d";
   };
 
-  # Keep only the last 3 system generations in boot menu
-  boot.loader.systemd-boot.configurationLimit = 3;
+   # Keep only the last 3 system generations in boot menu
+   boot.loader.systemd-boot.configurationLimit = 3;
 
-  # System version for NEW systems only (hosts may override)
-  system.stateVersion = "25.05";
+   # TPM tools for systems with TPM support
+   environment.systemPackages = (with pkgs; [
+     tpm2-tools
+     tpm2-tss
+   ]);
+
+   # System version for NEW systems only (hosts may override)
+   system.stateVersion = "25.05";
 }
