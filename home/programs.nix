@@ -1,22 +1,23 @@
 # Programs configuration
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, dconfEnabled ? true, ... }:
 
 let
   theme = config.theme or "nord";
   c = import ../themes/${theme}.nix;
+  gui = dconfEnabled; # single flag for GUI/desktop features
 in
 {
-  # Cursor theme
-  home.pointerCursor = {
+  # Cursor theme (GUI only)
+  home.pointerCursor = lib.mkIf gui {
     name = "Adwaita";
     package = pkgs.adwaita-icon-theme;
     size = 24;
     gtk.enable = true;
   };
 
-  # GTK theme and cursor (only for GUI systems)
-  gtk = {
-    enable = dconfEnabled;
+  # GTK theme (GUI only)
+  gtk = lib.mkIf gui {
+    enable = true;
     theme = {
       name = "Adwaita-dark";
       package = pkgs.gnome-themes-extra;
@@ -32,16 +33,17 @@ in
     };
   };
 
-  # Qt theme and cursor (only for GUI systems)
-  qt = {
-    enable = dconfEnabled;
+  # Qt theme (GUI only)
+  qt = lib.mkIf gui {
+    enable = true;
     platformTheme.name = "gtk";
     style = {
       name = "adwaita-dark";
       package = pkgs.adwaita-qt;
     };
   };
-# Alacritty terminal emulator
+
+  # Alacritty terminal emulator (headless OK)
   programs.alacritty = {
     enable = true;
     settings = {
@@ -79,7 +81,7 @@ in
     };
   };
 
-  # Tmux terminal multiplexer
+  # Tmux terminal multiplexer (headless OK)
   programs.tmux = {
     enable = true;
     terminal = "xterm-256color";
@@ -87,7 +89,7 @@ in
     prefix = "C-Space";
     baseIndex = 1;
     keyMode = "vi";
-    
+
     extraConfig = ''
       set-option -sa terminal-overrides ",xterm*:Tc"
 
@@ -153,29 +155,26 @@ in
     ];
   };
 
-  # Git configuration (if you want to manage this too)
+  # Git configuration (headless OK)
   programs.git = {
     enable = true;
     userName = "kyle";
     userEmail = "kyleshillingstad@gmail.com";
   };
 
-  
-
-  # Neovim with LazyVim
+  # Neovim (headless OK)
   programs.neovim = {
     enable = true;
-    # LazyVim config will be managed via xdg.configFile below
   };
 
-  # Manage LazyVim config with Home Manager
+  # LazyVim config (headless OK)
   xdg.configFile."nvim" = {
     source = inputs.lazyvim;
     recursive = true;
   };
 
-  # Wofi launcher
-  programs.wofi = {
+  # Wofi launcher (GUI only)
+  programs.wofi = lib.mkIf gui {
     enable = true;
     settings = {
       allow_markup = true;
@@ -296,8 +295,8 @@ in
     '';
   };
 
-  # Create custom desktop entries for better Wofi results
-  xdg.desktopEntries = {
+  # Desktop entries (GUI only)
+  xdg.desktopEntries = lib.mkIf gui {
     brave = {
       name = "Brave Browser";
       exec = "brave %U";
@@ -382,6 +381,5 @@ in
       categories = [ "System" "Settings" ];
       terminal = false;
     };
-    
   };
 }
