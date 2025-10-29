@@ -44,7 +44,7 @@ in
         
         
         "custom/dynamic" = {
-          exec = "/home/kyle/nixos-config/home/scripts/waybar-dynamic.sh";
+          exec = "/home/kyle/.config/waybar/dynamic.sh";
           format = "{}";
           interval = 3;
           tooltip = true;

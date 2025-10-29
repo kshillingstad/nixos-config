@@ -19,4 +19,14 @@
   nixpkgs.config.packageOverrides = pkgs: {
     libdrm = pkgs.libdrm.override { withValgrind = false; };
   };
+
+  # Wayland/NVIDIA environment stability tweaks
+  environment.variables = {
+    WLR_NO_HARDWARE_CURSORS = "1";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    LIBVA_DRIVER_NAME = "nvidia";
+    XDG_SESSION_TYPE = "wayland";
+    __GL_VRR_ALLOWED = "0"; # disable VRR initially; can toggle later
+  };
 }

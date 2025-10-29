@@ -19,7 +19,7 @@
         gaps_in = 6
         gaps_out = 12
         border_size = 2
-        resize_on_border = true
+        resize_on_border = false
         layout = dwindle
       }
 
@@ -29,8 +29,8 @@
         inactive_opacity = 0.85
         blur {
           enabled = yes
-          size = 6
-          passes = 2
+          size = 4
+          passes = 1
         }
         shadow {
           enabled = yes
@@ -52,6 +52,7 @@
 
       misc {
         disable_splash_rendering = true
+        force_default_wallpaper = 0
       }
 
       input {
