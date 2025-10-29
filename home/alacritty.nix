@@ -24,7 +24,7 @@ let
     scrolling = { history = 10000; };
     cursor = { style = "Block"; };
     selection = { save_to_clipboard = true; };
-    live_config_reload = true;
+    general = { live_config_reload = true; };
     colors = {
       primary = { background = "${c.base00}"; foreground = "${c.base06}"; };
       normal = {
