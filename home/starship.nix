@@ -49,7 +49,7 @@ symbol = " "
 impure_msg = "[impure shell](bold red)"
 pure_msg = "[pure shell](bold green)"
 unknown_msg = "[unknown shell](bold yellow)"
-format = "[[(  \($name\))](fg:#769ff0 bg:#212736)]($style)"
+format = "[[(  ($name))](fg:#769ff0 bg:#212736)]($style)"
 
 [nodejs]
 symbol = ""
