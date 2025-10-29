@@ -20,8 +20,8 @@
   
   # TPM + LUKS via reusable module
   my.tpmLuks.devices = {
-    "luks-e74e8861-32b3-4863-acb0-a3d0d554202d" = {
-      device = "/dev/disk/by-uuid/e74e8861-32b3-4863-acb0-a3d0d554202d";
+    "luks-aa186915-f570-4fc8-bb82-41685fd81007" = {
+      device = "/dev/disk/by-uuid/aa186915-f570-4fc8-bb82-41685fd81007";
       tpm2 = true;
     };
   };
