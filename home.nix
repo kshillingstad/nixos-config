@@ -80,7 +80,15 @@ in
       # Get system stats
       cpu_usage=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$3+$4+$5)} END {printf "%d", usage}')
       mem_usage=$(free | grep Mem | awk '{printf "%.1fG", $3/1024/1024}')
-      temp=$(cat /sys/class/hwmon/hwmon6/temp1_input 2>/dev/null | awk '{printf "%d°C", $1/1000}' || echo "N/A")
+      # Dynamic GPU temp path discovery (prefer NVIDIA/GPU sensor)
+      temp_path=$(for n in /sys/class/hwmon/hwmon*/name; do 
+        if grep -qiE 'gpu|nvidia' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; 
+      done | head -1)
+      if [ -n "$temp_path" ] && [ -r "$temp_path" ]; then
+        temp=$(awk '{printf "%d°C", $1/1000}' "$temp_path" 2>/dev/null)
+      else
+        temp="N/A"
+      fi
 
       # Rotate through system stats
       case $current_state in
