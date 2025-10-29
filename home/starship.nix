@@ -5,7 +5,7 @@
   programs.starship.enable = true;
 
   # External starship configuration file managed by Home Manager.
-  home.file.".config/starship/starship.toml" = {
+  home.file.".config/starship.toml" = {
     text = ''
 format = """
 [░▒▓](#a3aed2)\
