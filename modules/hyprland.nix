@@ -2,13 +2,13 @@
 
 {
   # Hyprland Wayland Compositor
-  programs.hyprland = {
+  programs.hyprland = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     xwayland.enable = true;
   };
 
    # Essential packages for Hyprland
-   environment.systemPackages = with pkgs; [
+   environment.systemPackages = lib.mkIf pkgs.stdenv.isLinux (with pkgs; [
      # Terminal emulator
      alacritty
      
@@ -51,7 +51,7 @@
    ];
 
   # XDG Desktop Portal for screen sharing and file dialogs
-  xdg.portal = {
+  xdg.portal = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-hyprland

@@ -1,8 +1,8 @@
 # Hyprland configuration
-{ config, ... }:
+{ config, pkgs, lib, ... }:
 
 {
-  wayland.windowManager.hyprland = {
+  wayland.windowManager.hyprland = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     systemd.enable = true; # manage Hyprland session with systemd user unit
     extraConfig = ''

@@ -1,5 +1,5 @@
 # Services configuration
-{ config, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   theme = config.theme or "nord";
@@ -7,7 +7,7 @@ let
 in
 {
   # Mako notifications
-  services.mako = {
+  services.mako = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     settings = {
       font = "Hack Nerd Font 12";

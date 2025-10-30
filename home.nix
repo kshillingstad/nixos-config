@@ -4,61 +4,52 @@ let
   # Theme configuration - default to nord for build time
   theme = "nord";
   c = import ./themes/${theme}.nix;
+  homeDir = if pkgs.stdenv.isDarwin then "/Users/kyle" else "/home/kyle";
 in
 {
   imports = [
-    ./home/hyprland.nix
     ./home/programs.nix
-    ./home/services.nix
     ./home/vscode.nix
     ./home/btop.nix
     ./home/starship.nix
     ./home/fastfetch.nix
     ./home/alacritty.nix
+    ./home/zsh.nix
+    ./home/nushell.nix
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    ./home/hyprland.nix
+    ./home/services.nix # mako
     ./home/waybar.nix
   ];
 
   home.username = "kyle";
-  home.homeDirectory = "/home/kyle";
+  home.homeDirectory = homeDir;
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
 
-# Extra packages for Wayland workflow (duplicates at system level are fine)
- home.packages = with pkgs; [
-    # Development tools
-    git
-    vim
-    curl
-    wget
-    # System monitoring
-    lm_sensors
-    # Bluetooth management
-    blueman
-    # WiFi management
-    networkmanagerapplet
-    # System utilities
-    jq
-    procps # for killall
-    libnotify # for notify-send
-    brightnessctl # for brightness control
-    
-    # Media control
-    playerctl
-    # Wallpaper management
-    hyprpaper
-    # Session management
-    wlogout
-    # Additional graphical apps
-    spotify
-    pavucontrol
-    blueman
-  ];
+  # Cross-platform base packages + OS-specific extras
+  home.packages = with pkgs; (
+    [
+      # Development tools (cross-platform)
+      git vim curl wget jq
+    ]
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      # Linux / Wayland specific utilities
+      procps lm_sensors libnotify
+      brightnessctl playerctl hyprpaper wlogout pavucontrol spotify
+    ]
+    ++ lib.optionals pkgs.stdenv.isDarwin [
+      # macOS specific developer/UX tweaks (GNU tools & GPG)
+      coreutils gnu-tar gnu-sed gnu-getopt gnupg pinentry-mac
+    ]
+  );
 
   # Alacritty baseline moved to home/alacritty.nix
 
   # Copy scripts to home directory
-  home.file.".config/waybar/dynamic.sh" = {
+  home.file.".config/waybar/dynamic.sh" = lib.mkIf pkgs.stdenv.isLinux {
     text = ''
       #!/usr/bin/env bash
 
@@ -85,19 +76,19 @@ in
       # Rotate through system stats
       case $current_state in
           0)
-              system_display=" $cpu_usage%"
+              system_display="\uf2db $cpu_usage%"
               next_state=1
               ;;
           1)
-              system_display=" $mem_usage"
+              system_display="\uf0c9 $mem_usage"
               next_state=2
               ;;
           2)
-              system_display=" $temp"
+              system_display="\uf2c9 $temp"
               next_state=0
               ;;
           *)
-              system_display=" $cpu_usage%"
+              system_display="\uf2db $cpu_usage%"
               next_state=1
               ;;
       esac
@@ -142,7 +133,7 @@ in
     executable = true;
   };
 
-  home.file.".config/logout.sh" = {
+  home.file.".config/logout.sh" = lib.mkIf pkgs.stdenv.isLinux {
     text = ''
       #!/usr/bin/env bash
       # Simple logout menu using wofi
@@ -168,7 +159,7 @@ in
     executable = true;
   };
 
-  home.file.".config/theme-picker.sh" = {
+  home.file.".config/theme-picker.sh" = lib.mkIf pkgs.stdenv.isLinux {
     text = ''
       #!/usr/bin/env bash
       # Theme picker menu using wofi

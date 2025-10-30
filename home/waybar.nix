@@ -1,12 +1,12 @@
 # Waybar configuration
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 let
   theme = config.theme or "nord";
   c = import ../themes/${theme}.nix;
 in
 {
-  programs.waybar = {
+  programs.waybar = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     settings = {
       mainBar = {
@@ -44,7 +44,7 @@ in
         
         
         "custom/dynamic" = {
-          exec = "/home/kyle/nixos-config/home/scripts/waybar-dynamic.sh";
+           exec = "/home/kyle/.config/waybar/dynamic.sh";
           format = "{}";
           interval = 3;
           tooltip = true;

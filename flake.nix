@@ -75,6 +75,15 @@
         };
     };
 
+    # macOS Home Manager configuration (standalone, not a nix-darwin module yet)
+    homeConfigurations = {
+      kyle-mac = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs { system = "aarch64-darwin"; };
+        extraSpecialArgs = { inherit inputs; dconfEnabled = false; }; # no dconf on mac
+        modules = [ ./home.nix ];
+      };
+    };
+
     # To add another machine, copy one of the existing host directories
     # into hosts/<newname> and add a new entry here similar to bfgpu/threadripper.
     # Keep host-specific logic inside hosts/<name>/default.nix and reuse modules/.

@@ -168,3 +168,49 @@ Located in `home/scripts/`:
 - The base configuration includes common settings like timezone, locale, and basic services
 - Theme files are in `themes/` directory using standardized color scheme format
 - All configurations use declarative Nix expressions for reproducibility
+
+## macOS (Home Manager Only)
+
+This flake also defines a standalone macOS Home Manager configuration (no nix-darwin yet). It automatically excludes Linux/Wayland-only modules using `lib.mkIf pkgs.stdenv.isLinux` and conditional imports.
+
+### Activate on macOS (aarch64-darwin)
+```bash
+# First time build + switch
+home-manager switch --flake .#kyle-mac
+
+# Or build only to test evaluation
+nix build .#homeConfigurations.kyle-mac.activationPackage
+```
+
+### Pattern for Linux-Only Additions
+When adding new Wayland / Linux-specific features (e.g. Hyprlock, swaybg, pipewire GUI tools), gate them:
+```nix
+programs.hyprlock = lib.mkIf pkgs.stdenv.isLinux { enable = true; };
+```
+Or for imports in `home.nix`:
+```nix
+imports = [ ./home/programs.nix ]
+  ++ lib.optionals pkgs.stdenv.isLinux [ ./home/hyprland.nix ./home/waybar.nix ];
+```
+
+### Darwin-Specific Packages
+Add macOS-only tools under:
+```nix
+home.packages = with pkgs; [
+  # cross-platform
+  git vim curl wget jq
+] ++ lib.optionals pkgs.stdenv.isDarwin [ coreutils gnu-tar gnu-sed gnu-getopt gnupg pinentry-mac ];
+```
+
+### What Is Skipped On macOS
+- Hyprland, Waybar, Mako
+- Linux-only scripts (wallpaper picker, theme picker, logout menu)
+- Brightness / screenshot utilities (grim, slurp, brightnessctl)
+
+### Migrating to nix-darwin Later
+You can wrap `homeConfigurations.kyle-mac` into a nix-darwin configuration by adding a `darwinConfigurations` entry and passing the Home Manager module; current gating logic will still work.
+
+### Troubleshooting
+- If evaluation fails complaining about a Linux package, ensure it is inside a `lib.mkIf pkgs.stdenv.isLinux` or `lib.optionals pkgs.stdenv.isLinux`.
+- For font issues, install Nerd Fonts via Homebrew or a nix derivation and adjust Alacritty config.
+- Restart affected apps after switching (Home Manager does not auto-reload them on macOS).

@@ -1,5 +1,5 @@
 # Programs configuration
-{ config, pkgs, inputs, lib, dconfEnabled ? true, ... }:
+{ config, pkgs, inputs, lib, dconfEnabled ? (pkgs.stdenv.isLinux) , ... }:
 
 let
   theme = config.theme or "nord";
