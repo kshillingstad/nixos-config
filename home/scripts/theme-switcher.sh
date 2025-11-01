@@ -141,34 +141,49 @@ EOF
 
 # Override alacritty config temporarily
 mkdir -p "$CONFIG_DIR/alacritty"
-cat > "$CONFIG_DIR/alacritty/alacritty.yml" << EOF
-font:
-  normal:
-    family: "Hack Nerd Font"
-window:
-  decorations: "none"
-colors:
-  primary:
-    background: "$base00"
-    foreground: "$base06"
-  normal:
-    black: "$base00"
-    red: "$base08"
-    green: "$base0B"
-    yellow: "$base0A"
-    blue: "$base0D"
-    magenta: "$base0E"
-    cyan: "$base0C"
-    white: "$base05"
-  bright:
-    black: "$base03"
-    red: "$base08"
-    green: "$base0B"
-    yellow: "$base0A"
-    blue: "$base0D"
-    magenta: "$base0E"
-    cyan: "$base0C"
-    white: "$base07"
+cat > "$CONFIG_DIR/alacritty/alacritty.toml" << EOF
+[font]
+normal = { family = "Hack Nerd Font" }
+
+[window]
+decorations = "none"
+dynamic_title = true
+
+[scrolling]
+history = 10000
+
+[cursor]
+style = "Block"
+
+[selection]
+save_to_clipboard = true
+
+[general]
+live_config_reload = true
+
+[colors.primary]
+background = "$base00"
+foreground = "$base06"
+
+[colors.normal]
+black = "$base00"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base05"
+
+[colors.bright]
+black = "$base03"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base07"
 EOF
 
 # Restart waybar with custom CSS

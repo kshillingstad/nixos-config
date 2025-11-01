@@ -1,8 +1,12 @@
 # Btop system monitor
-{ config, ... }:
+{ config, lib, ... }:
 
 let
-  theme = config.theme or "nord";
+  # Theme configuration - read from current-theme file or default to nord
+  currentThemeFile = /home/kyle/.config/current-theme;
+  theme = if builtins.pathExists currentThemeFile 
+    then lib.strings.removeSuffix "\n" (builtins.readFile currentThemeFile)
+    else "nord";
   c = import ../themes/${theme}.nix;
 in
 {

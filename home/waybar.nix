@@ -1,8 +1,12 @@
 # Waybar configuration
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 let
-  theme = config.theme or "nord";
+  # Theme configuration - read from current-theme file or default to nord
+  currentThemeFile = /home/kyle/.config/current-theme;
+  theme = if builtins.pathExists currentThemeFile 
+    then lib.strings.removeSuffix "\n" (builtins.readFile currentThemeFile)
+    else "nord";
   c = import ../themes/${theme}.nix;
 in
 {
@@ -31,9 +35,9 @@ in
         };
         
         network = { 
-          format-wifi = " "; 
-          format-ethernet = " "; 
-          format-disconnected = "睊 "; 
+          format-wifi = "󰖩 "; 
+          format-ethernet = "󰈀 "; 
+          format-disconnected = "󰖪 "; 
           tooltip-format-wifi = "WiFi: {essid}";
           tooltip-format-ethernet = "Ethernet";
           tooltip-format-disconnected = "Disconnected";

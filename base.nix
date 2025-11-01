@@ -64,6 +64,7 @@
    environment.systemPackages = (with pkgs; [
      tpm2-tools
      tpm2-tss
+     git-lfs  # For downloading wallpapers and other LFS files
    ]);
 
    # System version for NEW systems only (hosts may override)

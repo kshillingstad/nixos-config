@@ -2,9 +2,10 @@
 
 {
   # GNOME Desktop Environment
-  services.xserver.desktopManager.gnome.enable = true; # Provide GNOME sessions (Wayland + Xorg).
+  services.desktopManager.gnome.enable = true; # Updated renamed option (Wayland + Xorg).
   i18n.inputMethod = {
-    enabled = "ibus";
+    enable = true;
+    type = "ibus";
     ibus.engines = with pkgs.ibus-engines; [ ];
   };
 

@@ -1,8 +1,11 @@
-{ config, pkgs, lib, inputs, dconfEnabled ? true, ... }@args:
+{ config, pkgs, lib, inputs, dconfEnabled ? true, theme ? "nord", ... }@args:
 
 let
-  # Theme configuration - default to nord for build time
-  theme = "nord";
+  # Theme configuration - read from current-theme file or default to nord
+  currentThemeFile = /home/kyle/.config/current-theme;
+  theme = if builtins.pathExists currentThemeFile 
+    then lib.strings.removeSuffix "\n" (builtins.readFile currentThemeFile)
+    else "nord";
   c = import ./themes/${theme}.nix;
 in
 {
@@ -55,27 +58,72 @@ in
     blueman
   ];
 
-  # Alacritty baseline moved to home/alacritty.nix
+  # Initialize theme on rebuild if no current theme exists
+  home.activation.initTheme = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -f "$HOME/.config/current-theme" ]; then
+      echo "nord" > "$HOME/.config/current-theme"
+    fi
+    
+    # Always ensure alacritty config exists with current theme
+    CURRENT_THEME=$(cat "$HOME/.config/current-theme" 2>/dev/null || echo "nord")
+    THEME_COLORS=$(${pkgs.nix}/bin/nix eval --impure --json --expr "import $HOME/nixos-config/themes/$CURRENT_THEME.nix" | ${pkgs.jq}/bin/jq -r 'to_entries[] | "\(.key)=\(.value)"')
+    eval "$THEME_COLORS"
+    
+    mkdir -p "$HOME/.config/alacritty"
+    # Remove any existing symlink or file first
+    rm -f "$HOME/.config/alacritty/alacritty.toml"
+    cat > "$HOME/.config/alacritty/alacritty.toml" << EOF
+[font]
+normal = { family = "Hack Nerd Font" }
+
+[window]
+decorations = "none"
+dynamic_title = true
+
+[scrolling]
+history = 10000
+
+[cursor]
+style = "Block"
+
+[selection]
+save_to_clipboard = true
+
+[general]
+live_config_reload = true
+
+[colors.primary]
+background = "$base00"
+foreground = "$base06"
+
+[colors.normal]
+black = "$base00"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base05"
+
+[colors.bright]
+black = "$base03"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base07"
+EOF
+  '';
 
   # Copy scripts to home directory
   home.file.".config/waybar/dynamic.sh" = {
     text = ''
       #!/usr/bin/env bash
 
-      # Dynamic Waybar module that rotates between CPU, memory, and temperature
-      # and shows Spotify status with hover details
-
-      STATE_FILE="$HOME/.config/waybar/dynamic_state"
-      INTERVAL=3  # Rotate every 3 seconds
-
-      # Create state file if it doesn't exist
-      mkdir -p "$(dirname "$STATE_FILE")"
-      if [ ! -f "$STATE_FILE" ]; then
-          echo "0" > "$STATE_FILE"
-      fi
-
-      # Read current state
-      current_state=$(cat "$STATE_FILE")
+      # Static Waybar module that shows CPU, memory, and temperature all at once
 
       # Get system stats
       cpu_usage=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$3+$4+$5)} END {printf "%d", usage}')
@@ -85,33 +133,13 @@ in
         if grep -qiE 'gpu|nvidia' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; 
       done | head -1)
       if [ -n "$temp_path" ] && [ -r "$temp_path" ]; then
-        temp=$(awk '{printf "%d\u00b0C", $1/1000}' "$temp_path" 2>/dev/null)
+        temp=$(awk '{printf "%dC", $1/1000}' "$temp_path" 2>/dev/null)
       else
         temp="N/A"
       fi
 
-      # Rotate through system stats
-      case $current_state in
-          0)
-              system_display="\uf2db $cpu_usage%"
-              next_state=1
-              ;;
-          1)
-              system_display="\uf0c9 $mem_usage"
-              next_state=2
-              ;;
-          2)
-              system_display="\uf2c9 $temp"
-              next_state=0
-              ;;
-          *)
-              system_display="\uf2db $cpu_usage%"
-              next_state=1
-              ;;
-      esac
-
-      # Update state for next rotation
-      echo "$next_state" > "$STATE_FILE"
+      # Show all stats together
+      system_display="󰻠 $cpu_usage% 󰘚 $mem_usage 󰔏 $temp"
 
       # Output JSON for Waybar
       echo "{\"text\": \"$system_display\", \"tooltip\": \"CPU: $cpu_usage% | Memory: $mem_usage | Temp: $temp\"}"
@@ -122,29 +150,37 @@ in
   # GPU status script deployed via Home Manager for all hosts
   home.file.".config/waybar/gpu-status.sh" = {
     text = ''
-      #!/usr/bin/env bash
-      if command -v nvidia-smi >/dev/null 2>&1; then
-        IFS=',' read -r util temp power memUsed memTotal < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits | sed 's/ %,/%,/g')
-        if [[ -n "$memUsed" && -n "$memTotal" ]]; then
-          memPct=$(awk -v u="$memUsed" -v t="$memTotal" 'BEGIN { printf("%d", (u/t)*100) }')
-        else
-          memPct="?"
-        fi
-        text="GPU ${util}% ${temp}C ${memPct}% ${power}W"
-        tooltip="NVIDIA GPU\\nUtilization: ${util}%\\nTemperature: ${temp}C\\nPower: ${power}W\\nMemory: ${memUsed}MiB / ${memTotal}MiB (${memPct}%)"
-      else
-        # Attempt generic GPU temp via hwmon if no NVIDIA
-        temp_path=$(for n in /sys/class/hwmon/hwmon*/name; do if grep -qiE 'gpu|amdgpu' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; done | head -1)
-        if [[ -n "$temp_path" && -r "$temp_path" ]]; then
-          temp=$(awk '{printf "%d", $1/1000}' "$temp_path")
-          text="GPU ${temp}C"
-          tooltip="Generic GPU Temp: ${temp}C"
-        else
-          text="GPU N/A"
-          tooltip="No GPU stats available"
-        fi
-      fi
-      printf '{"text":"%s","tooltip":"%s"}' "$text" "$tooltip"
+       #!/usr/bin/env bash
+       HOSTNAME=$(hostname)
+       if command -v nvidia-smi >/dev/null 2>&1; then
+         IFS=',' read -r util temp power memUsed memTotal < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits | sed 's/ %,/%,/g')
+         if [[ -n "$memUsed" && -n "$memTotal" ]]; then
+           memPct=$(awk -v u="$memUsed" -v t="$memTotal" 'BEGIN { printf("%d", (u/t)*100) }')
+         else
+           memPct="?"
+         fi
+         
+         # Only show power consumption on desktop (non-laptop) systems
+         if [[ "$HOSTNAME" == "surface" ]]; then
+           text=$(printf "GPU %sW" "$(printf "%.0f" "$power")")
+           tooltip=$(printf "NVIDIA GPU Power: %sW" "$(printf "%.0f" "$power")")
+         else
+           text=$(printf "GPU %sW" "$(printf "%.0f" "$power")")
+           tooltip=$(printf "NVIDIA GPU Power: %sW" "$(printf "%.0f" "$power")")
+         fi
+       else
+         # Attempt generic GPU temp via hwmon if no NVIDIA
+         temp_path=$(for n in /sys/class/hwmon/hwmon*/name; do if grep -qiE 'gpu|amdgpu' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; done | head -1)
+         if [[ -n "$temp_path" && -r "$temp_path" ]]; then
+           temp=$(awk '{printf "%d", $1/1000}' "$temp_path")
+           text=$(printf "GPU %sC" "$temp")
+           tooltip=$(printf "Generic GPU Temp: %sC" "$temp")
+         else
+           text="GPU N/A"
+           tooltip="No GPU stats available"
+         fi
+       fi
+       printf '{"text":"%s","tooltip":"%s"}' "$text" "$tooltip"
     '';
     executable = true;
   };
@@ -154,7 +190,7 @@ in
       #!/usr/bin/env bash
 
       # Wallpaper picker using wofi
-      WALLPAPER_DIR="$HOME/wallpapers"
+       WALLPAPER_DIR="$HOME/nixos-config/wallpapers"
 
       if [ ! -d "$WALLPAPER_DIR" ]; then
           echo "Wallpaper directory not found: $WALLPAPER_DIR"
@@ -274,143 +310,158 @@ in
       # Override waybar CSS temporarily
       mkdir -p "$CONFIG_DIR/theme-overrides"
       cat > "$CONFIG_DIR/theme-overrides/waybar.css" << EOF
-      * { font-family: "Hack Nerd Font"; font-size: 16px; color: $base06; }
-      window#waybar { 
-        background: $base00; 
-        margin: 0;
-        border-radius: 0;
-       }
-      #workspaces button { padding: 0 8px; margin: 0 2px; }
-      #workspaces button.focused { background: $base0D; }
-      #clock, #cpu, #memory, #network, #temperature, #pulseaudio, #mpris, #battery, #tray { padding: 0 6px; margin: 0 1px; }
-      EOF
+* { font-family: "Hack Nerd Font"; font-size: 16px; color: $base06; }
+window#waybar { 
+  background: $base00; 
+  margin: 0;
+  border-radius: 0;
+}
+#workspaces button { padding: 0 8px; margin: 0 2px; }
+#workspaces button.focused { background: $base0D; }
+#clock, #cpu, #memory, #network, #temperature, #pulseaudio, #mpris, #battery, #tray { padding: 0 6px; margin: 0 1px; }
+EOF
 
       # Override wofi CSS temporarily
       mkdir -p "$CONFIG_DIR/theme-overrides"
       cat > "$CONFIG_DIR/theme-overrides/wofi.css" << EOF
-      * {
-        font-family: 'Hack Nerd Font', monospace;
-        font-size: 16px;
-      }
+* {
+  font-family: 'Hack Nerd Font', monospace;
+  font-size: 16px;
+}
 
-      window {
-        margin: 0px;
-        padding: 20px;
-        background-color: $base00;
-        opacity: 0.95;
-        border-radius: 12px;
-        border: 2px solid $base0D;
-      }
+window {
+  margin: 0px;
+  padding: 20px;
+  background-color: $base00;
+  opacity: 0.95;
+  border-radius: 12px;
+  border: 2px solid $base0D;
+}
 
-      #input {
-        margin: 0 0 10px 0;
-        padding: 12px;
-        border: none;
-        background-color: $base01;
-        color: $base06;
-        border-radius: 8px;
-        outline: none;
-      }
+#input {
+  margin: 0 0 10px 0;
+  padding: 12px;
+  border: none;
+  background-color: $base01;
+  color: $base06;
+  border-radius: 8px;
+  outline: none;
+}
 
-      #input:focus {
-        border: 2px solid $base0D;
-      }
+#input:focus {
+  border: 2px solid $base0D;
+}
 
-      #inner-box {
-        margin: 0;
-        padding: 0;
-        border: none;
-        background-color: $base00;
-      }
+#inner-box {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: $base00;
+}
 
-      #outer-box {
-        margin: 0;
-        padding: 0;
-        border: none;
-        background-color: $base00;
-      }
+#outer-box {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: $base00;
+}
 
-      #scroll {
-        margin: 0;
-        padding: 0;
-        border: none;
-        background-color: $base00;
-      }
+#scroll {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: $base00;
+}
 
-      #text {
-        margin: 5px;
-        padding: 8px;
-        border: none;
-        color: $base06;
-        border-radius: 6px;
-      }
+#text {
+  margin: 5px;
+  padding: 8px;
+  border: none;
+  color: $base06;
+  border-radius: 6px;
+}
 
-      #entry {
-        background-color: $base00;
-        border-radius: 6px;
-        margin: 2px 0;
-      }
+#entry {
+  background-color: $base00;
+  border-radius: 6px;
+  margin: 2px 0;
+}
 
-      #entry:selected {
-        background-color: $base0D;
-        color: $base00;
-        font-weight: bold;
-      }
+#entry:selected {
+  background-color: $base0D;
+  color: $base00;
+  font-weight: bold;
+}
 
-      #entry:selected #text {
-        color: $base00;
-      }
+#entry:selected #text {
+  color: $base00;
+}
 
-      #entry image {
-        -gtk-icon-transform: scale(0.8);
-        margin-right: 8px;
-      }
+#entry image {
+  -gtk-icon-transform: scale(0.8);
+  margin-right: 8px;
+}
 
-      #unselected {
-        background-color: transparent;
-      }
+#unselected {
+  background-color: transparent;
+}
 
-      #selected {
-        background-color: $base0D;
-      }
+#selected {
+  background-color: $base0D;
+}
 
-      #urgent {
-        background-color: $base08;
-        color: $base00;
-      }
-      EOF
+#urgent {
+  background-color: $base08;
+  color: $base00;
+}
+EOF
 
       # Override alacritty config temporarily
       mkdir -p "$CONFIG_DIR/alacritty"
-      cat > "$CONFIG_DIR/alacritty/alacritty.yml" << EOF
-      font:
-        normal:
-          family: "Hack Nerd Font"
-      window:
-        decorations: "none"
-      colors:
-        primary:
-          background: "$base00"
-          foreground: "$base06"
-        normal:
-          black: "$base00"
-          red: "$base08"
-          green: "$base0B"
-          yellow: "$base0A"
-          blue: "$base0D"
-          magenta: "$base0E"
-          cyan: "$base0C"
-          white: "$base05"
-        bright:
-          black: "$base03"
-          red: "$base08"
-          green: "$base0B"
-          yellow: "$base0A"
-          blue: "$base0D"
-          magenta: "$base0E"
-          cyan: "$base0C"
-          white: "$base07"
-      EOF
+      cat > "$CONFIG_DIR/alacritty/alacritty.toml" << EOF
+[font]
+normal = { family = "Hack Nerd Font" }
+
+[window]
+decorations = "none"
+dynamic_title = true
+
+[scrolling]
+history = 10000
+
+[cursor]
+style = "Block"
+
+[selection]
+save_to_clipboard = true
+
+[general]
+live_config_reload = true
+
+[colors.primary]
+background = "$base00"
+foreground = "$base06"
+
+[colors.normal]
+black = "$base00"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base05"
+
+[colors.bright]
+black = "$base03"
+red = "$base08"
+green = "$base0B"
+yellow = "$base0A"
+blue = "$base0D"
+magenta = "$base0E"
+cyan = "$base0C"
+white = "$base07"
+EOF
 
       # Save selected theme
       echo "$SELECTED_THEME" > "$CONFIG_DIR/current-theme"
