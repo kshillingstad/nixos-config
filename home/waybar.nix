@@ -15,7 +15,7 @@ in
         height = 26;
         modules-left = [ "hyprland/workspaces" "custom/dynamic" ];
         modules-center = [ "clock" ];
-        modules-right = [ "mpris" "custom/sep1" "network" "custom/sep2" "pulseaudio" "custom/sep3" "battery" "tray" ];
+         modules-right = [ "mpris" "custom/sep1" "network" "custom/sep2" "pulseaudio" "custom/sep3" "custom/gpu" "tray" ];
         
         clock = { 
           format = "{:%a %m/%d %I:%M %p}"; 
@@ -85,16 +85,13 @@ in
         
         
         
-        battery = { 
-          format = "{capacity}% {icon} "; 
-          format-charging = "{capacity}%  ";
-          format-full = "{capacity}% {icon} ";
-          format-icons = ["" "" "" "" ""]; 
-          format-time = "{H}h{M}m";
-          tooltip-format = "{timeTo} ({power}W)";
-          tooltip = true;
-          on-click = ""; 
-        };
+         "custom/gpu" = {
+           exec = "$HOME/.config/waybar/gpu-status.sh";
+           format = "{}";
+           interval = 5;
+           tooltip = true;
+           return-type = "json";
+         };
         
         
         
