@@ -7,21 +7,26 @@ This repository contains a structured NixOS configuration that can be deployed a
 ```
 ├── base.nix                    # Shared base configuration
 ├── flake.nix                   # Flake configuration with active hosts
+├── home.nix                    # Home Manager configuration with dynamic themes
+├── wallpaper.sh                # Wallpaper rotation script with scaling support
+├── wallpapers/                 # Curated wallpaper collection (Git LFS)
+├── themes/                     # Color scheme definitions for runtime switching
 ├── modules/                    # Reusable modules
 │   ├── desktop.nix            # Desktop environment setup
 │   ├── devtools.nix           # Development tools
+│   ├── hyprland.nix           # Hyprland window manager
+│   ├── greeter.nix            # TUIgreet login manager
 │   ├── sunshine.nix           # Sunshine streaming server
 │   └── kernel.nix             # Kernel configuration
+├── home/                      # Home Manager modules
+│   ├── hyprland.nix           # Hyprland configuration with wallpaper scaling
+│   ├── waybar.nix             # Status bar configuration
+│   ├── alacritty.nix          # Terminal configuration
+│   └── scripts/               # User scripts for themes and utilities
 └── hosts/                     # Machine-specific configurations
-    ├── bfgpu/                 # High-performance workstation with NVIDIA + desktop + sunshine
-    │   ├── default.nix
-    │   └── hardware-configuration.nix
+    ├── bfgpu/                 # High-performance workstation with NVIDIA + desktop
     ├── surface/               # Microsoft Surface laptop with Surface-specific tweaks
-    │   ├── default.nix
-    │   └── hardware-configuration.nix
     └── threadripper/          # Headless compute + ZFS + NVIDIA container
-        ├── default.nix
-        └── hardware-configuration.nix
 ```
 
 ## Adding a New Machine
@@ -76,9 +81,15 @@ sudo nixos-rebuild build --flake .#hostname
 
 ## Current Machines
 
-- **bfgpu**: High-performance workstation with NVIDIA GPU, full desktop environment (Wayland/GNOME), sunshine streaming server
-- **surface**: Microsoft Surface laptop with Surface-specific kernel (stable), NVIDIA GPU support, Firefox, full desktop environment (Wayland/GNOME)  
-- **threadripper**: Headless compute box with ZFS pool (Storage), NVIDIA open kernel driver + container toolkit for GPU workloads, Docker with GPU passthrough
+- **bfgpu**: High-performance workstation with NVIDIA GPU, Hyprland desktop environment, sunshine streaming server
+- **surface**: Microsoft Surface laptop with Surface-specific kernel, NVIDIA GPU support, Hyprland desktop environment  
+- **threadripper**: Headless compute box with ZFS pool, NVIDIA open kernel driver + container toolkit for GPU workloads, Docker with GPU passthrough
+
+All desktop machines include:
+- **Hyprland** window manager with optimized ultrawide monitor support
+- **Dynamic theme system** with 8 themes (Nord, Tokyo Night, Catppuccin, etc.)
+- **Intelligent wallpaper system** with auto-scaling and quality filtering
+- **Custom waybar** with system monitoring and media controls
 
 ## Maintenance Commands
 
@@ -151,7 +162,7 @@ sudo /run/current-system/bin/switch-to-configuration boot
 - **Media**: Spotify with MPRIS integration
 - **System monitoring**: btop with custom themes
 - **System info**: Fastfetch
-- **Wallpaper**: Dynamic picker with Hyprpaper
+- **Wallpaper**: Dynamic picker with Hyprpaper (auto-scaling to prevent stretching)
 
 ### Scripts
 Located in `home/scripts/`:
@@ -159,6 +170,13 @@ Located in `home/scripts/`:
 - `wallpaper-picker.sh`: Wallpaper selection
 - `waybar-dynamic.sh`: Dynamic waybar modules
 - `init-theme.sh`: Initialize theme system
+
+### Wallpaper System
+- **Location**: `wallpapers/` directory with curated high-quality images
+- **Auto-rotation**: Changes wallpaper every minute and on workspace switches
+- **Scaling**: Uses `contain` mode to prevent stretching on ultrawide/multi-monitor setups
+- **Picker**: Press `Mod + W` to manually select wallpapers via GUI
+- **Quality**: Low-quality images automatically removed to ensure crisp displays
 
 ## Notes
 
@@ -168,3 +186,19 @@ Located in `home/scripts/`:
 - The base configuration includes common settings like timezone, locale, and basic services
 - Theme files are in `themes/` directory using standardized color scheme format
 - All configurations use declarative Nix expressions for reproducibility
+- Wallpapers stored in Git LFS for efficient repository management
+- Hyprpaper configured with `contain` scaling to prevent image distortion on ultrawide displays
+
+## Recent Improvements
+
+### Wallpaper System Enhancements
+- **Auto-scaling**: Implemented `contain` mode to prevent stretching on ultrawide monitors
+- **Quality filtering**: Removed low-quality wallpapers (< 120KB) for better visual experience
+- **Proper paths**: Updated all scripts to use correct `nixos-config/wallpapers/` directory
+- **Git LFS integration**: Large wallpaper files managed efficiently via Git LFS
+
+### Theme System Overhaul
+- **Runtime switching**: Change themes instantly without system rebuilds
+- **Persistent configuration**: Theme selection survives across terminal sessions
+- **Comprehensive coverage**: Themes apply to Waybar, Alacritty, Wofi, and btop
+- **8 curated themes**: Nord, Tokyo Night, Catppuccin, Dracula, Gruvbox, One Dark, Solarized variants
