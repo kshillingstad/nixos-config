@@ -7,8 +7,9 @@
     systemd.enable = true; # manage Hyprland session with systemd user unit
     extraConfig = ''
       # --- Monitors ---
-      monitor=,preferred,auto,1.6
-      monitor=,addreserved,10,10,10,10
+      # Dell AW3423DWF 34" ultrawide OLED - max refresh rate
+      monitor = DP-4,3440x1440@164.90,0x0,1
+      monitor = ,preferred,auto,1
 
       # --- Environment ---
       env = XCURSOR_SIZE,32
@@ -77,15 +78,15 @@
       # --- Keybindings ---
       $mod = SUPER
       bind = $mod, Return, exec, alacritty
-      bind = $mod, T, exec, /home/kyle/.config/theme-picker.sh
+      bind = $mod, T, exec, $HOME/.config/theme-picker.sh
       bind = $mod, B, exec, brave
       bind = $mod, E, exec, thunar
       bind = $mod, N, exec, nm-connection-editor
       bind = $mod SHIFT, L, exec, hyprlock
       bind = $mod, Q, killactive
       bind = $mod, Space, exec, wofi --show run
-      bind = $mod, W, exec, /home/kyle/.config/wallpaper-picker.sh
-      bind = $mod, Escape, exec, /home/kyle/.config/logout.sh
+      bind = $mod, W, exec, $HOME/.config/wallpaper-picker.sh
+      bind = $mod, Escape, exec, $HOME/.config/logout.sh
       bind = $mod SHIFT, Q, exec, pkill Hyprland
 
       # Move focus
@@ -141,9 +142,19 @@
 
       # --- Exec once on session start ---
       exec-once = hyprpaper
-      exec-once = sleep 1 && /home/kyle/nixos-config/wallpaper.sh
+      exec-once = sleep 1 && $HOME/nixos-config/wallpaper.sh
       exec-once = waybar
       exec-once = mako
+    '';
+  };
+
+  # Provide a minimal hyprpaper config so the daemon stays running.
+  home.file.".config/hypr/hyprpaper.conf" = {
+    text = ''
+      # Starter wallpaper (will be randomized by wallpaper.sh shortly after login)
+      preload = $HOME/nixos-config/wallpapers/image000000.jpg
+      wallpaper = ,contain:$HOME/nixos-config/wallpapers/image000000.jpg
+      splash = false
     '';
   };
 }
