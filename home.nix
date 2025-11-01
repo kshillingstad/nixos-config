@@ -85,7 +85,7 @@ in
         if grep -qiE 'gpu|nvidia' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; 
       done | head -1)
       if [ -n "$temp_path" ] && [ -r "$temp_path" ]; then
-        temp=$(awk '{printf "%d°C", $1/1000}' "$temp_path" 2>/dev/null)
+        temp=$(awk '{printf "%d\u00b0C", $1/1000}' "$temp_path" 2>/dev/null)
       else
         temp="N/A"
       fi
@@ -93,19 +93,19 @@ in
       # Rotate through system stats
       case $current_state in
           0)
-              system_display=" $cpu_usage%"
+              system_display="\uf2db $cpu_usage%"
               next_state=1
               ;;
           1)
-              system_display=" $mem_usage"
+              system_display="\uf0c9 $mem_usage"
               next_state=2
               ;;
           2)
-              system_display=" $temp"
+              system_display="\uf2c9 $temp"
               next_state=0
               ;;
           *)
-              system_display=" $cpu_usage%"
+              system_display="\uf2db $cpu_usage%"
               next_state=1
               ;;
       esac
@@ -119,12 +119,42 @@ in
     executable = true;
   };
 
+  # GPU status script deployed via Home Manager for all hosts
+  home.file.".config/waybar/gpu-status.sh" = {
+    text = ''
+      #!/usr/bin/env bash
+      if command -v nvidia-smi >/dev/null 2>&1; then
+        IFS=',' read -r util temp power memUsed memTotal < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits | sed 's/ %,/%,/g')
+        if [[ -n "$memUsed" && -n "$memTotal" ]]; then
+          memPct=$(awk -v u="$memUsed" -v t="$memTotal" 'BEGIN { printf("%d", (u/t)*100) }')
+        else
+          memPct="?"
+        fi
+        text="GPU ${util}% ${temp}C ${memPct}% ${power}W"
+        tooltip="NVIDIA GPU\\nUtilization: ${util}%\\nTemperature: ${temp}C\\nPower: ${power}W\\nMemory: ${memUsed}MiB / ${memTotal}MiB (${memPct}%)"
+      else
+        # Attempt generic GPU temp via hwmon if no NVIDIA
+        temp_path=$(for n in /sys/class/hwmon/hwmon*/name; do if grep -qiE 'gpu|amdgpu' "$n"; then echo "$(dirname "$n")/temp1_input"; fi; done | head -1)
+        if [[ -n "$temp_path" && -r "$temp_path" ]]; then
+          temp=$(awk '{printf "%d", $1/1000}' "$temp_path")
+          text="GPU ${temp}C"
+          tooltip="Generic GPU Temp: ${temp}C"
+        else
+          text="GPU N/A"
+          tooltip="No GPU stats available"
+        fi
+      fi
+      printf '{"text":"%s","tooltip":"%s"}' "$text" "$tooltip"
+    '';
+    executable = true;
+  };
+
   home.file.".config/wallpaper-picker.sh" = {
     text = ''
       #!/usr/bin/env bash
 
       # Wallpaper picker using wofi
-      WALLPAPER_DIR="/home/kyle/nixos-config/wallpapers"
+      WALLPAPER_DIR="$HOME/wallpapers"
 
       if [ ! -d "$WALLPAPER_DIR" ]; then
           echo "Wallpaper directory not found: $WALLPAPER_DIR"

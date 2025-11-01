@@ -2,8 +2,11 @@
 
 {
   # GNOME Desktop Environment
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  services.xserver.desktopManager.gnome.enable = true; # Provide GNOME sessions (Wayland + Xorg).
+  i18n.inputMethod = {
+    enabled = "ibus";
+    ibus.engines = with pkgs.ibus-engines; [ ];
+  };
 
   # GNOME-specific packages
   environment.systemPackages = with pkgs; [
